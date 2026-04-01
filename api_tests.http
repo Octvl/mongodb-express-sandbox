@@ -1,0 +1,26 @@
+### Variables
+@hostname = localhost
+@port = 3000
+@baseUrl = http://{{hostname}}:{{port}}
+
+### 1. Test the Home Route
+GET {{baseUrl}}/
+Accept: application/json
+
+###
+
+### 2. Check Engine Status
+GET {{baseUrl}}/status
+Accept: application/json
+
+###
+
+### 3. Create a New Compliance Log
+POST {{baseUrl}}/logs
+Content-Type: application/json
+
+{
+    "action": "Initial Regulatory Audit - Chicago Property",
+    "category": "Compliance",
+    "notes": "Testing the outreach engine connectivity."
+}
