@@ -1,26 +1,85 @@
 ### Variables
 @hostname = localhost
 @port = 3000
-@baseUrl = http://{{hostname}}:{{port}}
+@baseUrl = http://{{hostname}}:{{port}}/api
 
-### 1. Test the Home Route
-GET {{baseUrl}}/
-Accept: application/json
+### ============================================================
+### SECTION 1: SYSTEM & HEALTH (controllers/systemController.js)
+### ============================================================
 
-###
+### 1. Test Welcome Message (The "Front Porch")
+GET {{baseUrl}}/system/
 
-### 2. Check Engine Status
-GET {{baseUrl}}/status
-Accept: application/json
+### 2. Check Engine Status (Database Connection & Count)
+GET {{baseUrl}}/system/status
 
-###
+### ============================================================
+### SECTION 2: LOG MANAGEMENT (controllers/logController.js)
+### ============================================================
 
-### 3. Create a New Compliance Log
+### 3. Create a New Compliance Log (Expected: 201 Created)
 POST {{baseUrl}}/logs
 Content-Type: application/json
 
 {
-    "action": "Initial Regulatory Audit - Chicago Property",
+    "action": "Elevator Safety Certification - Santiago Tower",
+    "category": "Maintenance",
+    "status": "Passed"
+}
+
+### 4. Get ALL Logs (The full list)
+GET {{baseUrl}}/logs
+
+### 5. Create a 'Failed' Log (Expected: 201 Created)
+POST {{baseUrl}}/logs
+Content-Type: application/json
+
+{
+    "action": "Fire Alarm Certification - Expired",
     "category": "Compliance",
-    "notes": "Testing the outreach engine connectivity."
+    "status": "Failed"
+}
+
+### 6. Query ONLY Failed Logs (Expected: 200 OK)
+GET {{baseUrl}}/logs?status=Failed
+Accept: application/json
+
+### ============================================================
+### SECTION 3: VALIDATION TESTS (Data Integrity)
+### ============================================================
+
+### 7. Test Validation Failure (Missing Category) (Expected: 400 Bad Request)
+POST {{baseUrl}}/logs
+Content-Type: application/json
+
+{
+    "action": "This should fail because there is no category"
+}
+
+### 8. Fail Test: Invalid Category (Expected: 400 Bad Request)
+POST {{baseUrl}}/logs
+Content-Type: application/json
+
+{
+    "action": "Faulty Log",
+    "category": "Pizza"
+}
+
+### 9. Test Status Default (Expected: 201 Created, Status: Pending)
+POST {{baseUrl}}/logs
+Content-Type: application/json
+
+{
+    "action": "Elevator Inspection - Chicago Office",
+    "category": "Maintenance"
+}
+
+### 10. Test Explicit 'Passed' Status (Expected: 201 Created, Status: Passed)
+POST {{baseUrl}}/logs
+Content-Type: application/json
+
+{
+    "action": "Annual Tax Filing - Santiago Property",
+    "category": "Compliance",
+    "status": "Passed"
 }
