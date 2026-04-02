@@ -1,5 +1,5 @@
 /**
- * Main application entry point for the FinTech Project server.
+ * Main application entry point for the Regulatory Compliance & Outreach Engine server.
  * This file initializes the Express application, connects to the database,
  * and sets up middleware and routes.
  */

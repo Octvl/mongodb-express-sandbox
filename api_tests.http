@@ -54,7 +54,7 @@ Accept: application/json
 
 ### 7. Soft Delete (Archive) a Log
 ### NOTE: Replace <LOG_ID> with an actual ID from the GET requests above
-DELETE {{baseUrl}}/logs/<LOG_ID>
+DELETE {{baseUrl}}/logs/69cd8cc5a2348738f2fdf9c3
 
 ### ============================================================
 ### SECTION 3: VALIDATION TESTS (Data Integrity)
