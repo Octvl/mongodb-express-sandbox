@@ -3,6 +3,16 @@
   "version": "1.0.0",
   "description": "Regulatory Compliance & Outreach Engine",
   "main": "server.js",
+  "keywords": [
+    "fintech",
+    "compliance",
+    "regulatory",
+    "mongodb",
+    "express"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "author": "Adrian Rivas",
   "license": "ISC",
   "scripts": {

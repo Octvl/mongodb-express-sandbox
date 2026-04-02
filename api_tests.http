@@ -1,3 +1,11 @@
+### ============================================================
+### FinTech Project API Test Suite
+### 
+### This file contains HTTP requests to test the API endpoints 
+### of the Compliance Engine. It requires the REST Client extension
+### (or equivalent) for execution directly from the code editor.
+### ============================================================
+
 ### Variables
 @hostname = localhost
 @port = 3000
@@ -43,6 +51,10 @@ Content-Type: application/json
 ### 6. Query ONLY Failed Logs (Expected: 200 OK)
 GET {{baseUrl}}/logs?status=Failed
 Accept: application/json
+
+### 7. Soft Delete (Archive) a Log
+### NOTE: Replace <LOG_ID> with an actual ID from the GET requests above
+DELETE {{baseUrl}}/logs/<LOG_ID>
 
 ### ============================================================
 ### SECTION 3: VALIDATION TESTS (Data Integrity)

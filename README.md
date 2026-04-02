@@ -11,8 +11,6 @@ The engine was inspired by the real-world logistical challenges of managing inte
 * **Automated Outreach Logic**: A backend engine that scans for upcoming deadlines and automatically triggers notifications.
 * **Audit-Ready Logging**: Utilizes **Mongoose** middleware to maintain an immutable history of compliance status changes.
 * **Flexible Schema Architecture**: A document-oriented data model that allows for the addition of new regulatory categories without database migrations.
-* **Secure Credential Management**: Implementation of industry-standard environment variables to protect sensitive database access.
-
 ---
 
 ## 🛠️ Tech Stack
@@ -46,18 +44,38 @@ The engine was inspired by the real-world logistical challenges of managing inte
     *Note: Ensure `.env` is listed in your `.gitignore` to prevent leaking credentials.*
 
 4.  **Start the server:**
+    For production or standard running:
     ```bash
-    node server.js
+    npm start
+    ```
+    For development with auto-reloading (via nodemon):
+    ```bash
+    npm run dev
     ```
     The server will run locally at `http://localhost:3000`.
 
 ---
 
-## 📖 Usage
+## 📖 API Usage
 
-* **GET `/`**: Confirms the server is live.
-* **GET `/status`**: Returns a JSON summary of the current database log count and engine health.
-* **POST `/logs`** *(Internal)*: Used by the engine to record new compliance events or outreach triggers.
+The engine is built around a RESTful API architecture. You can test these endpoints using the provided `api_tests.http` file via the VSCode REST Client extension.
+
+### System Endpoints
+* **GET `/`**: Redirects to the system info.
+* **GET `/api/system/`**: Confirms the server is live with a welcome message.
+* **GET `/api/system/status`**: Returns a JSON summary of the current database log count and engine health.
+
+### Log Management Endpoints
+* **GET `/api/logs`**: Retrieves all active compliance logs.
+* **GET `/api/logs?status=Failed`**: Retrieves logs filtered by specific status.
+* **POST `/api/logs`**: Records directly into the database.
+* **DELETE `/api/logs/:id`**: Performs a "Soft Delete" (archives the log while preserving the audit trail).
+
+---
+
+## 🧪 Architecture & Evolution
+
+This repository includes a `prototypes/` directory. These scripts (like `find_movie.js`) represent the initial research phase where I explored MongoDB's query logic before architecting the full Regulatory Compliance & Outreach Engine. I’ve included them to document the transition from standalone scripts to a production-grade MBC (Model-View-Controller) API. This structure provides better scalability, security, and maintainability compared to the original standalone scripts.
 
 ---
 
