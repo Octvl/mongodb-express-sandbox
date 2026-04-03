@@ -7,7 +7,6 @@
 // Import required modules and dependencies
 const express = require('express');
 const connectDB = require('./db'); // Reusing existing MongoDB connection logic
-const Log = require('./models/Log'); // Log model for database interactions
 
 // Initialize the Express application
 const app = express();
@@ -31,8 +30,11 @@ connectDB();
  * 3. ROUTES MOUNTING
  * Separate route files handle different API endpoints for better organization.
  */
-// Mount logs-related routes under /api/logs
-app.use('/api/logs', require('./routes/logRoutes'));
+// Mount attempts-related routes under /api/v1/attempts
+app.use('/api/v1/attempts', require('./routes/attemptRoutes'));
+
+// Mount outreach-related routes under /api/v1/outreach
+app.use('/api/v1/outreach', require('./routes/outreachRoutes'));
 
 // Mount system-related routes (status, welcome) under /api/system
 app.use('/api/system', require('./routes/systemRoutes'));

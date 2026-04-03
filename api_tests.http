@@ -1,9 +1,9 @@
 ### ============================================================
-### FinTech Project API Test Suite
+### Fiber Guardian API Test Suite
 ### 
 ### This file contains HTTP requests to test the API endpoints 
-### of the Compliance Engine. It requires the REST Client extension
-### (or equivalent) for execution directly from the code editor.
+### of the compliance middleware. It requires the REST Client
+### extension (or equivalent) for execution directly from the code editor.
 ### ============================================================
 
 ### Variables
@@ -12,86 +12,87 @@
 @baseUrl = http://{{hostname}}:{{port}}/api
 
 ### ============================================================
-### SECTION 1: SYSTEM & HEALTH (controllers/systemController.js)
+### SECTION 1: SYSTEM HEALTH (controllers/systemController.js)
 ### ============================================================
 
-### 1. Test Welcome Message (The "Front Porch")
+### 1. Test Welcome Message (Redirected from root)
 GET {{baseUrl}}/system/
 
-### 2. Check Engine Status (Database Connection & Count)
+### 2. Check Engine Status (Database Connection & OutreachAttempt ledger count)
 GET {{baseUrl}}/system/status
 
 ### ============================================================
-### SECTION 2: LOG MANAGEMENT (controllers/logController.js)
+### SECTION 2: OUTREACH VALIDATION (POST /api/v1/outreach/validate)
 ### ============================================================
 
-### 3. Create a New Compliance Log (Expected: 201 Created)
-POST {{baseUrl}}/logs
+### 3. Validate Compliant Outreach (Expected: SEND)
+POST {{baseUrl}}/v1/outreach/validate
 Content-Type: application/json
 
 {
-    "action": "Elevator Safety Certification - Santiago Tower",
-    "category": "Maintenance",
-    "status": "Passed"
+    "debtorId": "65e23f1a23b4c5d6e7f8g9h0",
+    "transcript": "Hello, this is a courtesy call regarding your recent statement.",
+    "status": "PASSED",
+    "aiReasoning": "Polite, compliant language. Within allowed timezone boundaries."
 }
 
-### 4. Get ALL Logs (The full list)
-GET {{baseUrl}}/logs
-
-### 5. Create a 'Failed' Log (Expected: 201 Created)
-POST {{baseUrl}}/logs
+### 4. Validate Blocked Outreach - Harassment (Expected: BLOCK)
+POST {{baseUrl}}/v1/outreach/validate
 Content-Type: application/json
 
 {
-    "action": "Fire Alarm Certification - Expired",
-    "category": "Compliance",
-    "status": "Failed"
+    "debtorId": "65e23f1a23b4c5d6e7f8g9h0",
+    "transcript": "Pay your debt immediately or we will involve local law enforcement.",
+    "status": "BLOCKED_CONTENT",
+    "aiReasoning": "Blocked: Harassment. The phrase 'involve local law enforcement' falsely implies criminal proceedings for a civil debt."
 }
 
-### 6. Query ONLY Failed Logs (Expected: 200 OK)
-GET {{baseUrl}}/logs?status=Failed
-Accept: application/json
+### 5. Validate Blocked Outreach - Timezone Violation (Expected: BLOCK)
+POST {{baseUrl}}/v1/outreach/validate
+Content-Type: application/json
 
-### 7. Soft Delete (Archive) a Log
-### NOTE: Replace <LOG_ID> with an actual ID from the GET requests above
-DELETE {{baseUrl}}/logs/69cd8cc5a2348738f2fdf9c3
+{
+    "debtorId": "65e23f1a23b4c5d6e7f8g9h0",
+    "transcript": "This is an automated text message regarding your balance.",
+    "status": "BLOCKED_TIME",
+    "aiReasoning": "Blocked: Timezone Violation. Local time for debtor is 10:15 PM. FDCPA regulates outreach strictly between 8 AM and 9 PM."
+}
 
 ### ============================================================
-### SECTION 3: VALIDATION TESTS (Data Integrity)
+### SECTION 3: ATTEMPT LEDGER (GET & DELETE /api/v1/attempts)
 ### ============================================================
 
-### 7. Test Validation Failure (Missing Category) (Expected: 400 Bad Request)
-POST {{baseUrl}}/logs
+### 6. Get ALL Logged Attempts (Ledger History)
+GET {{baseUrl}}/v1/attempts
+
+### 7. Get ONLY Blocked Content Attempts (Filtered via Query Param)
+GET {{baseUrl}}/v1/attempts?status=BLOCKED_CONTENT
+
+### 8. Soft Delete (Archive) an Attempt
+### NOTE: Replace <ATTEMPT_ID> below with an actual _id dynamically generated from tests above
+DELETE {{baseUrl}}/v1/attempts/<ATTEMPT_ID>
+
+### ============================================================
+### SECTION 4: DATA INTEGRITY TESTS (Mongoose Schema Defenses)
+### ============================================================
+
+### 9. Test Missing Debtor ID (Expected: 400 Bad Request)
+### The Mongoose schema firmly requires the `debtorId` field.
+POST {{baseUrl}}/v1/outreach/validate
 Content-Type: application/json
 
 {
-    "action": "This should fail because there is no category"
+    "transcript": "This attempt is missing a debtor ID.",
+    "status": "ERROR"
 }
 
-### 8. Fail Test: Invalid Category (Expected: 400 Bad Request)
-POST {{baseUrl}}/logs
+### 10. Test Invalid Status Enum Logic (Expected: 400 Bad Request)
+### The `status` property only expects specific Enumerable values (e.g. BLOCKED_TIME).
+POST {{baseUrl}}/v1/outreach/validate
 Content-Type: application/json
 
 {
-    "action": "Faulty Log",
-    "category": "Pizza"
-}
-
-### 9. Test Status Default (Expected: 201 Created, Status: Pending)
-POST {{baseUrl}}/logs
-Content-Type: application/json
-
-{
-    "action": "Elevator Inspection - Chicago Office",
-    "category": "Maintenance"
-}
-
-### 10. Test Explicit 'Passed' Status (Expected: 201 Created, Status: Passed)
-POST {{baseUrl}}/logs
-Content-Type: application/json
-
-{
-    "action": "Annual Tax Filing - Santiago Property",
-    "category": "Compliance",
-    "status": "Passed"
+    "debtorId": "65e23f1a23b4c5d6e7f8g9h0",
+    "transcript": "Invalid enum status payload.",
+    "status": "RANDOM_UNAUTHORIZED_STATUS"
 }

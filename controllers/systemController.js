@@ -4,8 +4,8 @@
  * overall operational status and basic diagnostic information.
  */
 
-// Import the Log model to interact with the database (specifically for counting logs)
-const Log = require('../models/Log');
+// Import the OutreachAttempt model to interact with the database (specifically for counting logs)
+const OutreachAttempt = require('../models/OutreachAttempt');
 
 /**
  * @desc    Get the welcome HTML message for the Compliance Engine API
@@ -25,10 +25,10 @@ exports.getWelcomeMessage = (req, res) => {
 exports.getEngineStatus = async (req, res) => {
     try {
         /**
-         * Count the total number of documents in the 'logs' collection.
+         * Count the total number of documents in the 'interactions' collection.
          * This provides a quick metric of system activity.
          */
-        const count = await Log.countDocuments();
+        const count = await OutreachAttempt.countDocuments();
         
         // Return a JSON object with system details
         res.json({

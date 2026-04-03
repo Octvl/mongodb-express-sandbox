@@ -1,11 +1,17 @@
-# 🧪 Prototypes & Early Experiments
+# 🧪 Prototypes & Diagnostics
 
-This directory contains the foundational scripts created during the initial research and development phase of the Regulatory Compliance & Outreach Engine. 
+This directory contains standalone diagnostic scripts and foundational experiments used during the development of the **Fiber Guardian** middleware layer.
 
-These standalone scripts were used to test database connectivity, learn the schema logic, and validate queries before the project was refactored into a scalable MVC (Model-View-Controller) architecture using Express.js.
+These scripts are critical for directly validating database connectivity, schema alignments, and exploring logic safely isolated from the main Express.js application and the local AI (Llama 3.1) pipeline. Keeping these isolated allows us to quickly verify that the underlying MongoDB Atlas infrastructure is sound before routing live traffic through the production endpoints.
 
 ## 📂 File Directory
 
-* **`test.js`**: My first successful connection to the MongoDB Atlas cluster. Verified network access by executing a diagnostic ping and a simple document insertion into a sandbox collection.
-* **`find_movie.js`**: An exploration into MongoDB's query syntax and projection logic. It searches the standard `sample_mflix` dataset to retrieve a specific record without returning unnecessary metadata.
-* **`app.js`**: A prototype for full CRUD operations. It demonstrates the ability to query the main compliance logs and safely delete test data, serving as the blueprint for the eventual `logController.js` logic.
+* **`test_models.js`**: A diagnostic utility used to verify that the core Fiber Guardian Mongoose models (`DebtorProfile`, `RegulatoryRule`, `OutreachAttempt`) are actively communicating and correctly mapped to their respective collections (`accounts`, `rules`, `interactions`). Run this whenever schemas or `.env` connections change.
+
+## 🚀 Running Diagnostics
+
+To execute any of these standalone diagnostic tools, ensure you run them from the **root directory** of the project so they correctly interface with your `.env` variables:
+
+```bash
+node prototypes/test_models.js
+```
