@@ -30,7 +30,7 @@ POST {{baseUrl}}/v1/outreach/validate
 Content-Type: application/json
 
 {
-    "debtorId": "65e23f1a23b4c5d6e7f8g9h0",
+    "debtorId": "65e23f1a23b4c5d6e7f8aaaa",
     "transcript": "Hello, this is a courtesy call regarding your recent statement.",
     "status": "PASSED",
     "aiReasoning": "Polite, compliant language. Within allowed timezone boundaries."
@@ -41,7 +41,7 @@ POST {{baseUrl}}/v1/outreach/validate
 Content-Type: application/json
 
 {
-    "debtorId": "65e23f1a23b4c5d6e7f8g9h0",
+    "debtorId": "65e23f1a23b4c5d6e7f8aaaa",
     "transcript": "Pay your debt immediately or we will involve local law enforcement.",
     "status": "BLOCKED_CONTENT",
     "aiReasoning": "Blocked: Harassment. The phrase 'involve local law enforcement' falsely implies criminal proceedings for a civil debt."
@@ -52,7 +52,7 @@ POST {{baseUrl}}/v1/outreach/validate
 Content-Type: application/json
 
 {
-    "debtorId": "65e23f1a23b4c5d6e7f8g9h0",
+    "debtorId": "65e23f1a23b4c5d6e7f8aaaa",
     "transcript": "This is an automated text message regarding your balance.",
     "status": "BLOCKED_TIME",
     "aiReasoning": "Blocked: Timezone Violation. Local time for debtor is 10:15 PM. FDCPA regulates outreach strictly between 8 AM and 9 PM."
@@ -92,7 +92,56 @@ POST {{baseUrl}}/v1/outreach/validate
 Content-Type: application/json
 
 {
-    "debtorId": "65e23f1a23b4c5d6e7f8g9h0",
+    "debtorId": "65e23f1a23b4c5d6e7f8aaaa",
     "transcript": "Invalid enum status payload.",
     "status": "RANDOM_UNAUTHORIZED_STATUS"
+}
+
+### ============================================================
+### SECTION 5: ZERO-TRUST COMPLIANCE REFACTOR TESTS
+### ============================================================
+
+### 11. Test Malformed ObjectId in Archive Route (Expected: 400 Bad Request)
+### Validates that the Mongoose isValidObjectId catches bad formatting 
+### before attempting a database cast, preventing runtime exceptions.
+DELETE {{baseUrl}}/v1/attempts/malformed-id-123
+
+### 12. Test NoSQL Injection Attempt on Filters (Expected: 400 Bad Request)
+### Tests our rigorous defense against query parameter injection. Passing status[$ne]=ERROR
+### will be rejected because the controller strictly bounds parameters as primitive strings.
+GET {{baseUrl}}/v1/attempts?status[$ne]=ERROR
+
+### 13. Test Strict ENUM bounds on Filters (Expected: 400 Bad Request)
+### Even if formatted structurally as a string, unrecognized payload states 
+### will be intercepted before ever reaching the database layer.
+GET {{baseUrl}}/v1/attempts?status=UNKNOWN_FILTER_TYPE
+
+### ============================================================
+### SECTION 6: LUXON DETERMINISTIC TIMEZONE TESTS
+### ============================================================
+
+### 14. Test Missing Debtor Profile (Expected: 404 Not Found)
+### The validate endpoint now explicitly verifies the debtor exists 
+### before attempting to derive local timezone math.
+POST {{baseUrl}}/v1/outreach/validate
+Content-Type: application/json
+
+{
+    "debtorId": "65e23f1a23b4c5d6e7f8g9cc",
+    "transcript": "Checking for missing profile.",
+    "status": "PASSED"
+}
+
+### 15. Test Timezone Violation Dynamically
+### NOTE: Requires a seeded DebtorProfile matching the ID below.
+### If the server runs this exactly between 8 AM and 9 PM in the debtor's 
+### strict timezone, it will evaluate to SEND. If executed outside those hours, 
+### Luxon explicitly intercepts the request and safely forces a `BLOCKED_TIME`.
+POST {{baseUrl}}/v1/outreach/validate
+Content-Type: application/json
+
+{
+    "debtorId": "65e23f1a23b4c5d6e7f8aaaa",
+    "transcript": "Hello, checking if you are currently within safe outreach hours.",
+    "status": "PASSED"
 }

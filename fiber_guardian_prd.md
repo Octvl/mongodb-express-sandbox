@@ -33,7 +33,13 @@ The system natively integrates with your existing `models/`, `controllers/`, `ro
 6. **Step 6: Gatekeeper Response**
    The application resolves the initial API request returning the final decision to the upstream agent (`SEND` or `BLOCK`).
 
-## 4. Database Schemas (MongoDB)
+## 4. Zero-Trust MongoDB Validation
+Fiber Guardian enforces strict zero-trust hygiene before executing any database reads or writes via Mongoose. This ensures regulatory audits are entirely deterministic and sound:
+- **Connection Ready-State Checks:** All diagnostic or compliance routes proactively verify `mongoose.connection.readyState`. If the primary database goes offline, requests fail safely with detailed `503 Service Unavailable` metadata rather than failing gracefully or timing out, ensuring the AI model is never queried loosely.
+- **Explicit Type Enforcement:** IDs from clients are sanitized through `mongoose.isValidObjectId()` and explicit casting rather than risky Regex checks.
+- **Idempotent Updates:** Data masking and archiving use targeted filters (`$ne`) to separate missing data from logically archived data, enforcing predictable, transparent workflows.
+
+## 5. Database Schemas (MongoDB)
 Schemas align directly with your current Mongoose `models/` directory, operating within the `fiber_guardian_db` database:
 
 **Model: `DebtorProfile` (Collection: `accounts`)**

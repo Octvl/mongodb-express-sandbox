@@ -4,7 +4,7 @@
  * overall operational status and basic diagnostic information.
  */
 
-// Import the OutreachAttempt model to interact with the database (specifically for counting logs)
+const mongoose = require('mongoose');
 const OutreachAttempt = require('../models/OutreachAttempt');
 
 /**
@@ -24,6 +24,14 @@ exports.getWelcomeMessage = (req, res) => {
  */
 exports.getEngineStatus = async (req, res) => {
     try {
+        // Zero-Trust: Explicitly verify database connectivity before querying
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({
+                error: "Service Unavailable: Database connection severed.",
+                details: "The compliance engine halted the request to prevent unsecured operations."
+            });
+        }
+
         /**
          * Count the total number of documents in the 'interactions' collection.
          * This provides a quick metric of system activity.
@@ -41,6 +49,6 @@ exports.getEngineStatus = async (req, res) => {
          * If the database is unreachable or the query fails, 
          * return a 500 error with a specific message.
          */
-        res.status(500).json({ error: "Database unreachable" });
+        res.status(500).json({ error: `Internal Server Error: ${error.message}` });
     }
 };

@@ -11,6 +11,7 @@ Built by **Adrian Rivas**, a recent graduate of **Stanford University's Symbolic
 ## 🚀 Features
 
 * **Dual-Layer Validation**: Intercepts AI collection messages before they are sent and evaluates them legally.
+* **Zero-Trust Mongoose Validation**: Enforces strict schema constraints, ObjectID parameter hygiene, and precise Database connection ready-state checks before interacting with the persistent layer.
 * **Deterministic Gates**: Eliminates easy violations by enforcing local timezone verifications and frequency capping (e.g., Regulation F's "7-in-7" rule).
 * **Probabilistic AI Analysis**: Analyzes transcript intent for harassment, abusive language, or false legal threats using local GPU inference (Llama 3.1).
 * **Audit-Ready Logging**: Transparently logs the exact "Reasoning Artifact" for each `OutreachAttempt` (both passes and blocked violations) natively into MongoDB.
@@ -19,7 +20,7 @@ Built by **Adrian Rivas**, a recent graduate of **Stanford University's Symbolic
 
 ## 🛠️ Tech Stack
 
-* **Database**: MongoDB Atlas (Cloud NoSQL)
+* **Database**: MongoDB Atlas (Cloud NoSQL) managed via Mongoose ODM for rigid zero-trust security.
 * **Backend**: Node.js & Express.js
 * **AI Model Pipeline**: Local Llama 3.1 (Ollama integration mapped via standard REST interface)
 * **Development Environment**: Google Antigravity
